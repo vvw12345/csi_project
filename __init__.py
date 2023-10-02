@@ -56,16 +56,16 @@ wavelet_denoised_csi_amp = apply_wavelet_denoising(filtered_csi_amp, wavelet='db
 savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, window_length=5, polynomial_order=2)
 
 #获得DTW矩阵
-dtw_mat = compute_dtw_matrix(savitzky_golay_denoised_csi_amp)
-dtw_select = select_subcarriers(dtw_mat)
-print(dtw_select)
+#dtw_mat = compute_dtw_matrix(savitzky_golay_denoised_csi_amp)
+#dtw_select = select_subcarriers(dtw_mat)
+#print(dtw_select)
 
 #采用pca数据降维，在数据降维之前首先要把数据压缩为2维数组
 reshaped_data = butterworth_denoised_csi_amp.reshape(savitzky_golay_denoised_csi_amp.shape[0], -1)
 pca_reduced_csi_amp,selected_eigenvectors, explained_variance_ratio = perform_pca(reshaped_data,0.95)
 #print(pca_reduced_csi_amp.shape)
 # 绘制图形，并将天线和子载波信息添加到图上
-#plot_data(range(len(pca_reduced_csi_amp)),pca_reduced_csi_amp,selected_eigenvectors,7)
+plot_data(range(len(pca_reduced_csi_amp)),pca_reduced_csi_amp,selected_eigenvectors,7)
 
 
 
