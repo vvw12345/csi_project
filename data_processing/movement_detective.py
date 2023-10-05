@@ -29,27 +29,18 @@ def moving_variance(csi_data, subcarrier_idx, k=10): #k为当前点向前考虑�
 #根据信号的移动方差计算活动的开始和结束
 def detect_activity(variances):
     threshold_low = 1
-    threshold_high = 10
+    threshold_high = 8
     activities = [1 if threshold_low < s2 < threshold_high else 0 for s2 in variances]
     return activities
 
-#绘制原始的csi数据和提取的动作区间 主要是为了评估效果
-def plot_csi_with_activity(csi_data, subcarrier_idx, activities, grace_period=400):
-    """
-    绘制CSI数据，并根据活动列表标注动作区间。
 
-    参数:
-    - csi_data: ndarray, 预处理的CSI数据
-    - subcarrier_idx: int, 子载波索引
-    - activities: list, 动作标注，1 表示有动作，0 表示没有
-    - grace_period: int, 允许的连续无动作的最大长度，超过这个值才断开区间
-    """
-    # 绘制CSI数据
-    plt.plot(range(len(csi_data)), csi_data[:, 0, 0, subcarrier_idx], label='CSI DATA', color='g')
-    
-    # 标注动作
+#grace_period参数：表示动作的最大间断时间戳 多长时间视为动作断掉重新开始计时
+#这个函数最关键的点就是调整好动作间断的判断参数，避免把连续的行为识别成离散的多个行为
+def get_activity_intervals(activities, grace_period=400):
+    intervals = []
     start_activity = None
     no_activity_count = 0
+
     for i, activity in enumerate(activities):
         if activity == 1 and start_activity is None:
             start_activity = i
@@ -57,21 +48,34 @@ def plot_csi_with_activity(csi_data, subcarrier_idx, activities, grace_period=40
             if start_activity is not None:
                 no_activity_count += 1
                 if no_activity_count > grace_period:
-                    plt.axvspan(start_activity, i - no_activity_count, color='red', alpha=0.5)
+                    intervals.append((start_activity, i - no_activity_count))
                     start_activity = None
                     no_activity_count = 0
         else:
             no_activity_count = 0
 
-    # 如果在最后还有持续的动作，关闭区间
+    # 如果在最后还有持续的动作，添加区间
     if start_activity is not None:
-        plt.axvspan(start_activity, len(activities), color='red', alpha=0.5)
+        intervals.append((start_activity, len(activities)))
+
+    return intervals
+
+#绘制原始的csi数据和提取的动作区间 主要是为了评估效果,subcarrier_idx指定绘图子载波数
+#intervals代表动作的起始和结束区间
+def plot_csi_with_intervals(csi_data, subcarrier_idx, intervals):
+    # 绘制CSI数据
+    plt.plot(range(len(csi_data)), csi_data[:, 0, 0, subcarrier_idx], label='CSI DATA', color='g')
+    
+    # 标注活动区间
+    for start, end in intervals:
+        plt.axvspan(start, end, color='red', alpha=0.5)
     
     plt.title("CSI Data with Detected Activity")
     plt.xlabel("Time")
     plt.ylabel("Amplitude")
     plt.legend()
     plt.show()
+
 
 
 

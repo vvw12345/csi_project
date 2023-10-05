@@ -58,14 +58,19 @@ savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, 
 
 '''
 基于滑动方差的动作提取
+目前动作识别效果还是一般般，等待优化
 '''
 # 使用函数
-variances = moving_variance(filtered_csi_amp, 5)
+target_subcarrier_idx = 6
+variances = moving_variance(filtered_csi_amp, target_subcarrier_idx)
 print(max(variances))
 print(min(variances))
 activities = detect_activity(variances)
 #print(activities)
-plot_csi_with_activity(filtered_csi_amp, 5, activities)
+intervals = get_activity_intervals(activities)
+#print(intervals)
+plot_csi_with_intervals(filtered_csi_amp, target_subcarrier_idx, intervals)
+
 
 
 '''基于DTW算法的子载波选择
