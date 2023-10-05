@@ -72,7 +72,7 @@ intervals = get_activity_intervals(activities)
 plot_csi_with_intervals(filtered_csi_amp, target_subcarrier_idx, intervals)
 
 
-
+#111
 '''基于DTW算法的子载波选择
 #获得DTW矩阵
 #dtw_mat = compute_dtw_matrix(savitzky_golay_denoised_csi_amp)
