@@ -2,6 +2,13 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.signal import medfilt
 
+'''
+行去中心化，Z-core标准化，min-max标准化
+注意二者的区别
+行去中心化让每行的变量减去这行均值，常用于PCA的前置步骤，图像处理等
+Z-core标准化指对整个矩阵计算均值，减去均值并除以标准差，常用于机器学习的前置步骤，目的是为了让每个特征的权重是相同的
+min-max标准化缩小范围，常用于对小范围敏感的函数，比如sigmoid函数
+'''
 #对csi数据的行向量进行去中心化处理
 #消除信号的静态成分
 def centerize_csi(csi_data):
@@ -13,10 +20,33 @@ def centerize_csi(csi_data):
 
     return centered_csi_data
 
+#Z-core标准化
+def z_core_standardization(data):
+    mean = np.mean(data)
+    std_dev = np.std(data)
+    
+    standardized_data = (data - mean) / std_dev
+    return standardized_data
+
+
+#min-max标准化 new_min指标准化后数据的最小值 new_max指标准化后数据的最大值
+#公式 ： x = (x - min) / (max - min)
+def min_max_standardization(data, new_min=0, new_max=1):
+    old_min = np.min(data)
+    old_max = np.max(data)
+    
+    standardized_data = (data - old_min) * (new_max - new_min) / (old_max - old_min) + new_min
+    return standardized_data
+
+
+
+'''
+信号直流分量去除 一般是定位到频谱index = 0的位置
+'''
 #对信号先进行FFT变换获取频谱图，然后去除信号直流分量，再进行IFFT变换把信号还原为时域图
 #data (numpy.ndarray): 输入信号数据，要求格式为 (N, M, P, L)，其中 N 表示包数，M 表示发射天线数，P 表示接收天线数，L 表示子载波数。
 #sampling_frequency指信号采样频率，此处设置默认值为1000
-#对于FFT变换得到的频率，是关于y轴对称的，因此直流分量一般来说是在0出
+#对于FFT变换得到的频率，是关于y轴对称的，因此直流分量一般来说是在0出现的，因此如果需要去除分量只需要找到0的位置，然后置0即可
 def remove_dc_component(data, sampling_frequency=1000):
     # 对数据进行FFT变换
     fft_result = np.fft.fft(data, axis=-1)  # 对最后一个维度进行FFT

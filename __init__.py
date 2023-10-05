@@ -63,8 +63,8 @@ savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, 
 # 使用函数
 target_subcarrier_idx = 6
 variances = moving_variance(filtered_csi_amp, target_subcarrier_idx)
-print(max(variances))
-print(min(variances))
+#print(max(variances))
+#print(min(variances))
 activities = detect_activity(variances)
 #print(activities)
 intervals = get_activity_intervals(activities)
