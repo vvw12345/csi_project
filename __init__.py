@@ -6,6 +6,7 @@ from data_loading.csi_csv import *
 from data_processing.preprocessing import *
 from data_processing.denoising import *
 from data_processing.dimension_reduction import *
+from data_processing.movement_detective import *
 
 ##注：本函数将为整个csi数据的流程：数据读入->预处理->特征提取->机器学习
 
@@ -55,18 +56,33 @@ wavelet_denoised_csi_amp = apply_wavelet_denoising(filtered_csi_amp, wavelet='db
 #使用savitzky_golay滤波器
 savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, window_length=5, polynomial_order=2)
 
+'''
+基于滑动方差的动作提取
+'''
+# 使用函数
+variances = moving_variance(filtered_csi_amp, 5)
+print(max(variances))
+print(min(variances))
+activities = detect_activity(variances)
+#print(activities)
+plot_csi_with_activity(filtered_csi_amp, 5, activities)
+
+
+'''基于DTW算法的子载波选择
 #获得DTW矩阵
 #dtw_mat = compute_dtw_matrix(savitzky_golay_denoised_csi_amp)
 #dtw_select = select_subcarriers(dtw_mat)
 #print(dtw_select)
+'''
 
+'''基于PCA算法的数据降维
 #采用pca数据降维，在数据降维之前首先要把数据压缩为2维数组
 reshaped_data = butterworth_denoised_csi_amp.reshape(savitzky_golay_denoised_csi_amp.shape[0], -1)
 pca_reduced_csi_amp,selected_eigenvectors, explained_variance_ratio = perform_pca(reshaped_data,0.95)
 #print(pca_reduced_csi_amp.shape)
 # 绘制图形，并将天线和子载波信息添加到图上
 plot_data(range(len(pca_reduced_csi_amp)),pca_reduced_csi_amp,selected_eigenvectors,7)
-
+'''
 
 
 
@@ -96,13 +112,13 @@ print(data_list)
 #plt.figure(figsize=(10, 5))
 
 # 绘制原始 CSI 幅度数据
-#plt.plot(range(len(csi_amp)), csi_amp[:, 0, 1, 10], label='init__csi', color='b')
+#plt.plot(range(len(csi_amp)), csi_amp[:, 0, 0, 5], label='init__csi', color='b')
 # #绘制去中心化之后的csi数据
 # #plt.plot(range(len(centerize_csi_amp)), centerize_csi_amp[:, 0, 0, 6], label='centerize__csi', color='g')
 # #绘制数据插值之后的csi数据
 # #plt.plot(range(len(interpolated_csi_amp)), interpolated_csi_amp[:, 0, 0, 6], label='interpolated_csi', color='r')
 # #绘制汉普滤波器之后得到的csi数据
-# plt.plot(range(len(filtered_csi_amp)), filtered_csi_amp[:, 0, 0, 6], label='filtered_csi', color='g')
+#plt.plot(range(len(filtered_csi_amp)), filtered_csi_amp[:, 0, 0, 5], label='filtered_csi', color='g')
 # #plt.plot(range(len(signal_without_dc)),np.real(signal_without_dc[:,0,0,6]),color = 'g')
 # plt.plot(range(len(savitzky_golay_denoised_csi_amp)), savitzky_golay_denoised_csi_amp[:, 0, 0, 6], label='savitzky_golay', color='r')
 # plt.plot(range(len(wavelet_denoised_csi_amp)), wavelet_denoised_csi_amp[:, 0, 0, 6], label='wavelet_csi', color='m')
@@ -111,6 +127,7 @@ print(data_list)
 # plt.ylabel('CSI')
 # plt.title('CSI Data Comparison')
 # plt.legend()
+#plt.show()
 
 
 

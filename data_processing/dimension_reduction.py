@@ -85,7 +85,7 @@ def plot_data(timestamps, reduced_data, selected_eigenvectors, top_k=5):
     
 '''
 DTW算法实现子载波选择
-(计算量较大)
+(计算量较大)先别用，后面再优化一下
 '''
 #快速计算DTW距离
 def fastdtw_distance(matrix1, matrix2):
