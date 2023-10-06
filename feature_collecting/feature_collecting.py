@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import iqr, entropy
+from collections import OrderedDict
 
 '''
 特征值计算
@@ -13,9 +14,9 @@ from scipy.stats import iqr, entropy
 import numpy as np
 from scipy.stats import entropy
 
-def calculate_features(csi_data):
+def calculate_features(csi_data,label):
     num_timestamps, num_ntx, num_nrx, num_subcarriers = csi_data.shape
-    features = {}
+    all_features = OrderedDict()
 
     # 遍历每个发射天线和接收天线
     for t in range(num_ntx):
@@ -31,14 +32,20 @@ def calculate_features(csi_data):
                 mad = np.median(np.abs(subcarrier_data - np.median(subcarrier_data)))  # 中位数绝对偏差
                 quartile_25, quartile_75 = np.percentile(subcarrier_data, [25, 75])  # 四分位距
                 iqr_value = quartile_75 - quartile_25  # 四分位距
-                info_entropy = entropy(subcarrier_data)  # 信息熵
+                
+                # 获取非零元素
+                non_zero_data = subcarrier_data[subcarrier_data > 0]
+                # 计算非零元素的概率
+                prob = non_zero_data / non_zero_data.sum()
+                info_entropy = -np.sum(prob * np.log(prob))# 信息熵
+                
                 max_value = np.max(subcarrier_data)  # 最大值
                 min_value = np.min(subcarrier_data)  # 最小值
                 difference = max_value - min_value  # 差值
 
                 # 存储特征值到字典中
                 key = f'NTX_{t+1}_NRX_{r+1}_Subcarrier_{i+1}'
-                features[key] = {
+                features = {
                     '标准差': std_deviation,
                     '活动时长': activity_duration,
                     '中位数绝对偏差': mad,
@@ -46,8 +53,10 @@ def calculate_features(csi_data):
                     '信息熵': info_entropy,
                     '最大值': max_value,
                     '最小值': min_value,
-                    '差值': difference
+                    '差值': difference,
+                    'labels': label
                 }
 
-    return features
+    all_features[key] = features
+    return all_features
 

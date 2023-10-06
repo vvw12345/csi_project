@@ -27,6 +27,7 @@ if not os.path.exists(output_directory):
 
 #全流程处理函数
 def processing_function(file):
+    filename = os.path.basename(file)
     '''
     数据读入部分
     '''
@@ -79,11 +80,12 @@ def processing_function(file):
     '''
     特征值提取部分
     '''
-    features = calculate_features(butterworth_denoised_csi_amp)
-    label = extract_label_from_filename(file)
+    label = extract_label_from_filename(filename)
+    features = calculate_features(butterworth_denoised_csi_amp,label)
+    #print(features)
     
     # 存储到csv
-    save_features_to_csv(features, label, output_path)
+    save_features_to_csv(features,output_path)
     
 # 遍历lab01_data和lab02_data文件夹
 for lab_folder in ['lab01_data', 'lab02_data']:
