@@ -22,8 +22,8 @@ output_directory = os.path.join(current_path,'feature_output')
 output_path = os.path.join(output_directory,'output.csv')
 
 #如果输出目录不存在就创建一个
-if not os.path.exists(output_path):
-    os.makedirs(output_path)
+if not os.path.exists(output_directory):
+    os.makedirs(output_directory)
 
 #全流程处理函数
 def processing_function(file):
@@ -61,10 +61,10 @@ def processing_function(file):
     #print(butterworth_denoised_csi_amp.shape)
 
     #使用小波去噪
-    wavelet_denoised_csi_amp = apply_wavelet_denoising(filtered_csi_amp, wavelet='db4', level=3)
+    #wavelet_denoised_csi_amp = apply_wavelet_denoising(filtered_csi_amp, wavelet='db4', level=3)
     
     #使用savitzky_golay滤波器
-    savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, window_length=5, polynomial_order=2)
+    #savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, window_length=5, polynomial_order=2)
 
     '''
     基于滑动方差的动作提取
