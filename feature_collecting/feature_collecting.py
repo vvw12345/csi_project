@@ -58,5 +58,5 @@ def calculate_features(csi_data,label):
                 }
 
     all_features[key] = features
-    return all_features
+    return features
 
