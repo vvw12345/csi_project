@@ -44,6 +44,9 @@ interpolated_csi_amp,new_timestamps,timestamps_too_high,timestamps_too_low = int
 #hampel滤波器去除离群值
 filtered_csi_amp = hampel_filter(interpolated_csi_amp,3,3)
 
+'''
+巴特沃斯滤波器，小波去噪，savitzky_golay滤波器降噪部分
+'''
 #设置巴特沃斯滤波器相关参数
 #截止频率：一种常用的经验法则是选择截止频率的值，使其位于采样频率的一半以下，通常在0.2倍采样频率到0.4倍采样频率之间。
 cutoff_frequency = 400.0  # 截止频率
@@ -51,10 +54,15 @@ sampling_frequency = 1000.0  # 采样频率
 
 butterworth_denoised_csi_amp = denoise_csi_data(filtered_csi_amp, cutoff_frequency, sampling_frequency)
 #print(butterworth_denoised_csi_amp.shape)
+
 #使用小波去噪
 wavelet_denoised_csi_amp = apply_wavelet_denoising(filtered_csi_amp, wavelet='db4', level=3)
+
 #使用savitzky_golay滤波器
 savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, window_length=5, polynomial_order=2)
+
+
+
 
 '''
 基于滑动方差的动作提取
@@ -72,7 +80,7 @@ intervals = get_activity_intervals(activities)
 plot_csi_with_intervals(filtered_csi_amp, target_subcarrier_idx, intervals)
 
 
-#111
+
 '''基于DTW算法的子载波选择
 #获得DTW矩阵
 #dtw_mat = compute_dtw_matrix(savitzky_golay_denoised_csi_amp)
@@ -91,25 +99,11 @@ plot_data(range(len(pca_reduced_csi_amp)),pca_reduced_csi_amp,selected_eigenvect
 
 
 
-# most_important_component = np.argmax(explained_variance_ratio)
-# most_important_eigenvector = selected_eigenvectors[:, most_important_component]
-# most_important_index = np.argmax(np.abs(most_important_eigenvector))
-    
-# tx_antenna, rx_antenna, subcarrier = np.unravel_index(most_important_index, (3, 3, 30))
 
 
 
-'''
-# 获取预训练好的PCA模型的特征值
-eigenvalues = pca_model.explained_variance_
-# 获取预训练好的PCA模型的方差贡献率
-explained_variance_ratio = pca_model.explained_variance_ratio_
-data_list = list(zip(eigenvalues, explained_variance_ratio))
-# 打印特征值和方差贡献率列表
-print("特征值和方差贡献率列表:")
-print(data_list)
-'''
-#plot_variance_explained(pca_model)
+
+
 
 
 

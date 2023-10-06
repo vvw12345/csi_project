@@ -3,9 +3,12 @@ from scipy.stats import iqr, entropy
 
 '''
 特征值计算
-标准差：CSI幅度方差的算术平方根
-活动时长：CSI滑动方差超过阈值时间
-
+标准差：CSI幅度方差的算数平方根
+活动时长：CSI滑动方差超过阈值时间（此处应该指动作提取的部分）
+中位数绝对偏差：CSI幅度绝对偏差的中位数
+四分位距：CSI幅度的四等分中第三个四分位上的值和第一个四分位上的值的差
+信息熵：CSI幅度信息含量的量化指标
+最大值，最小值，差值
 '''
 def calculate_features(csi_data):
     features = {}
