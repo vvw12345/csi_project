@@ -11,9 +11,9 @@ def save_features_to_csv(features,csv_file):
     
     # 判断文件是否存在，如果存在则追加，否则创建新文件
     if os.path.exists(csv_file):
-        df.to_csv(csv_file, mode='a', header=False)
+        df.to_csv(csv_file, mode='a', header=False,index=False)
     else:
-        df.to_csv(csv_file, mode='w')
+        df.to_csv(csv_file, mode='w',index=False)  #不存入索引列 保留特征索引
 
    
 #从文件名字中提取出关键字打上标签

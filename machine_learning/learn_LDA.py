@@ -5,12 +5,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import accuracy_score
 
+readpath = "./feature_output/output.csv"
+
 # 从CSV文件中读取数据
-data = pd.read_csv("result_lab01.csv")
+data = pd.read_csv(readpath)
 
 # 提取特征和标签
-features = data.drop(["label"], axis=1)  # 假设标签在最后一列，此处使用drop函数去除标签列
-labels = data["label"]
+features = data.drop(["labels"], axis=1)  # 假设标签在最后一列，此处使用drop函数去除标签列
+labels = data["labels"]
 
 # 将数据集分为训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(

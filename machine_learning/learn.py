@@ -4,8 +4,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
+
+readpath = "./feature_output/output.csv"
+
 # 从CSV文件中读取数据
-data = pd.read_csv('output.csv')
+data = pd.read_csv(readpath)
+
+print(data.columns)
 
 # 提取特征和标签
 features = data.drop(['labels'], axis=1)  # 假设标签在最后一列，此处使用drop函数去除标签列

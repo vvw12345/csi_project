@@ -56,7 +56,7 @@ def calculate_features(csi_data,label):
                     '差值': difference,
                     'labels': label
                 }
-
-    all_features[key] = features
-    return features
+                all_features[key] = features
+                
+    return all_features
 
