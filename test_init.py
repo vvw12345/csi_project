@@ -47,19 +47,19 @@ filtered_csi_amp = hampel_filter(interpolated_csi_amp,3,3)
 '''
 巴特沃斯滤波器，小波去噪，savitzky_golay滤波器降噪部分
 '''
-#设置巴特沃斯滤波器相关参数
-#截止频率：一种常用的经验法则是选择截止频率的值，使其位于采样频率的一半以下，通常在0.2倍采样频率到0.4倍采样频率之间。
-cutoff_frequency = 400.0  # 截止频率
-sampling_frequency = 1000.0  # 采样频率
+# #设置巴特沃斯滤波器相关参数
+# #截止频率：一种常用的经验法则是选择截止频率的值，使其位于采样频率的一半以下，通常在0.2倍采样频率到0.4倍采样频率之间。
+# cutoff_frequency = 400.0  # 截止频率
+# sampling_frequency = 1000.0  # 采样频率
 
-butterworth_denoised_csi_amp = denoise_csi_data(filtered_csi_amp, cutoff_frequency, sampling_frequency)
-#print(butterworth_denoised_csi_amp.shape)
+# butterworth_denoised_csi_amp = denoise_csi_data(filtered_csi_amp, cutoff_frequency, sampling_frequency)
+# #print(butterworth_denoised_csi_amp.shape)
 
-#使用小波去噪
-wavelet_denoised_csi_amp = apply_wavelet_denoising(filtered_csi_amp, wavelet='db4', level=3)
+# #使用小波去噪
+# wavelet_denoised_csi_amp = apply_wavelet_denoising(filtered_csi_amp, wavelet='db4', level=3)
 
-#使用savitzky_golay滤波器
-savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, window_length=5, polynomial_order=2)
+# #使用savitzky_golay滤波器
+# savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, window_length=5, polynomial_order=2)
 
 
 
@@ -68,16 +68,16 @@ savitzky_golay_denoised_csi_amp = apply_savitzky_golay_filter(filtered_csi_amp, 
 基于滑动方差的动作提取
 目前动作识别效果还是一般般，等待优化
 '''
-# 使用函数
-target_subcarrier_idx = 6
-variances = moving_variance(filtered_csi_amp, target_subcarrier_idx)
-#print(max(variances))
-#print(min(variances))
-activities = detect_activity(variances)
-#print(activities)
-intervals = get_activity_intervals(activities)
-#print(intervals)
-plot_csi_with_intervals(filtered_csi_amp, target_subcarrier_idx, intervals)
+# # 使用函数
+# target_subcarrier_idx = 6
+# variances = moving_variance(filtered_csi_amp, target_subcarrier_idx)
+# #print(max(variances))
+# #print(min(variances))
+# activities = detect_activity(variances)
+# #print(activities)
+# intervals = get_activity_intervals(activities)
+# #print(intervals)
+# plot_csi_with_intervals(filtered_csi_amp, target_subcarrier_idx, intervals)
 
 
 
