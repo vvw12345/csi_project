@@ -40,15 +40,15 @@ def processing_function(file):
     csi_amp = np.abs(csi_np)
     print(csi_amp.shape)
     #数据去中心化
-    #centerize_csi_amp = centerize_csi(csi_amp)
+    centerize_csi_amp = centerize_csi(csi_amp)
     
     # #数据插值和去重获得新的赋值数据（此处我们选择数据前后的10%作为插值和去重的临界点）
-    # (interpolated_csi_amp,
-    #  new_timestamps,timestamps_too_high,
-    #  timestamps_too_low) = interpolate_and_remove_csi(centerize_csi_amp,timestamps,1100,900)
+    (interpolated_csi_amp,
+      new_timestamps,timestamps_too_high,
+     timestamps_too_low) = interpolate_and_remove_csi(centerize_csi_amp,timestamps,1100,900)
     
     # #hampel滤波器去除离群值
-    # filtered_csi_amp = hampel_filter(interpolated_csi_amp,3,3)
+    filtered_csi_amp = hampel_filter(interpolated_csi_amp,3,3)
     
     # '''
     # 巴特沃斯滤波器，小波去噪，savitzky_golay滤波器降噪部分
@@ -90,6 +90,9 @@ def processing_function(file):
     '''
     行为识别——机器学习模型拟合部分
     '''
+    pass
+
+
     
 # 遍历lab01_data和lab02_data文件夹
 for lab_folder in ['lab01_data', 'lab02_data']:

@@ -67,11 +67,12 @@ def remove_dc_component(data, sampling_frequency=1000):
     
     return signal_without_dc
 
-
-#csi数据插值，一般来说csi数据的丢包率在5%-10%之间，此处要根据数据的时间戳信息进行修补
-#首先要把要插值的数据传进来，然后把横坐标时间戳传进来（此处也是从read_bf_file读出来的信息）
-#最大时间间隔和最小时间间隔对于每个数据集都不同，需要手动定义
-#调试可以知道：当我们设定发包参数为1000的时候(也就是一秒钟发1000个包，两个包之间相隔10^-3秒)，会在1000上下跳动（波动比较大）
+'''
+csi数据插值，一般来说csi数据的丢包率在5%-10%之间，此处要根据数据的时间戳信息进行修补
+首先要把要插值的数据传进来，然后把横坐标时间戳传进来（此处也是从read_bf_file读出来的信息）
+最大时间间隔和最小时间间隔对于每个数据集都不同，需要手动定义
+调试可以知道：当我们设定发包参数为1000的时候(也就是一秒钟发1000个包，两个包之间相隔10^-3秒)，会在1000上下跳动（波动比较大）
+'''
 def interpolate_and_remove_csi(csi_amp, timestamps,max_time,low_time):
     # 初始化插值器,此处采用线性插值
     interpolator = interp1d(timestamps, csi_amp, kind='linear', axis=0)
@@ -112,9 +113,10 @@ def interpolate_and_remove_csi(csi_amp, timestamps,max_time,low_time):
             
     return np.array(new_csi_amp), np.array(new_timestamps),timestamps_diff_too_high,timestamps_diff_too_low
 
-
+'''
 #使用hampel滤波器对离群值进行去除，window_size为滑动窗口的大小，n_sigma为中位数绝对偏差的倍数，用来确定阈值
 #基本原理：在一个滑动窗口内计算其所有元素的中位数值，并用中位数绝对值估计各个元素和其的标准差，如果超过sigma个标准差，那就用中位数值替换其
+'''
 def hampel_filter(csi_data, kernel_size=3, threshold_multiplier=3.0):
     filtered_csi_data = np.zeros_like(csi_data)
 
