@@ -70,5 +70,102 @@ def get_scale_csi(csi_st):
     elif csi_st['Ntx'] == 3:
         ret = ret * math.sqrt(dbinv(4.5))
     return ret
+
+
+
+'''
+参考csiread的相位校准函数
+phase为未校准相位，k为子载波序列数组
+函数首先将phase和k转换为数组。定义了两个切片slice1和slice2，这两个切片用于从phase中提取特定的部分。
+计算斜率a，它表示相位的变化率。计算偏移b，它是相位的平均值。
+使用斜率和偏移来校准相位。
+返回校准后的相位。
+'''
+def calib_csiread(phase, k, axis=1):
+    """Phase calibration
+
+    Args:
+        phase (ndarray): Unwrapped phase of CSI.
+        k (ndarray): Subcarrier index
+        axis (int): Axis along which is subcarrier. Default: 1
+
+    Returns:
+        ndarray: Phase calibrated
+
+    Examples:
+
+        >>> csi = csidata.csi[:10]
+        >>> phase = np.unwrap(np.angle(csi), axis=1)
+        >>> phase = calib(phase, k=scidx(20, 2), axis=1)
+
+    References:
+        1. `Enabling Contactless Detection of Moving Humans with Dynamic Speeds
+        Using CSI <#>`_
+    """
+    p = np.asarray(phase)
+    k = np.asarray(k)
+
+    slice1 = [slice(None, None)] * p.ndim
+    slice1[axis] = slice(-1, None)
+    slice1 = tuple(slice1)
+    slice2 = [slice(None, None)] * p.ndim
+    slice2[axis] = slice(None, 1)
+    slice2 = tuple(slice2)
+    shape1 = [1] * p.ndim
+    shape1[axis] = k.shape[0]
+    shape1 = tuple(shape1)
+
+    k_n, k_1 = k[-1], k[0]
+    a = (p[slice1] - p[slice2]) / (k_n - k_1)
+    b = p.mean(axis=axis, keepdims=True)
+    k = k.reshape(shape1)
+
+    phase_calib = p - a * k - b
+    return phase_calib
     
+'''
+改写了calib函数，使其能够对相位进行处理
+'''
+def calib(phase, k, axis=-1):
+    """Phase calibration
+
+    Args:
+        phase (ndarray): Unwrapped phase of CSI.
+        k (ndarray): Subcarrier index
+        axis (int): Axis along which is subcarrier. Default: -1 (last axis)
+
+    Returns:
+        ndarray: Phase calibrated
+
+    Examples:
+
+        >>> csi = csidata.csi[:10]
+        >>> phase = np.unwrap(np.angle(csi), axis=-1)
+        >>> phase = calib(phase, k=scidx(20, 2), axis=-1)
+
+    References:
+        1. `Enabling Contactless Detection of Moving Humans with Dynamic Speeds
+        Using CSI <#>`_
+    """
+    p = np.asarray(phase)
+    k = np.asarray(k)
+
+    slice1 = [slice(None, None)] * p.ndim
+    slice1[axis] = slice(-1, None)
+    slice1 = tuple(slice1)
+    slice2 = [slice(None, None)] * p.ndim
+    slice2[axis] = slice(None, 1)
+    slice2 = tuple(slice2)
+    shape1 = [1] * p.ndim
+    shape1[axis] = k.shape[0]
+    shape1 = tuple(shape1)
+
+    k_n, k_1 = k[-1], k[0]
+    a = (p[slice1] - p[slice2]) / (k_n - k_1)
+    b = p.mean(axis=axis, keepdims=True)
+    k = k.reshape(shape1)
+
+    phase_calib = p - a * k - b
+    return phase_calib
+
 

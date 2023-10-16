@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import os
+import csiread
 from data_loading.csi_getting import *
 from data_loading.data_reading import *
 from data_loading.csi_csv import *
@@ -8,11 +9,12 @@ from data_processing.denoising import *
 from data_processing.dimension_reduction import *
 from data_processing.movement_detective import *
 
+
 ##注：本函数将为整个csi数据的流程：数据读入->预处理->特征提取->机器学习
 
 path = r"./data_loading/mytest.dat"
 directory = r"./datas"
-output_directory = r"./output"
+#output_directory = r"./output"
 #path2 = r"./data_loading/output.csv"
 
 # #如果输出目录不存在就创建一个
@@ -21,17 +23,60 @@ output_directory = r"./output"
     
 # file_list = os.listdir(directory)
 
+
+#基于csiread包里面的数据读入部分，和自己实现的区别在于返回数组的格式有所不同
+#因此相位的校准函数要自己写
+csidata = csiread.Intel(path,ntxnum=3,nrxnum=3,pl_size=10)
+csidata.read()
+csi = csidata.get_scaled_csi()
+print(csi.shape)
+csi_amplitude = np.abs(csi)
+csi_phase2 = np.unwrap(np.angle(csi), axis=1)
+sub_csiread = scidx(20,2)
+print(sub_csiread.shape)
+csi_phase = calib_csiread(csi_phase2, scidx(20, 2))
+print(csi_phase2.shape)
+print('__________')
+
+
 bf = read_bf_file(path)
 
 csi_list = list(map(get_scale_csi,bf))
 timestamps = [entry['timestamp_low'] for entry in bf]
-#print(timestamps)
-#save_csv(csi_list,path2)
+
 csi_np = (np.array(csi_list))
 
 #计算幅值
 csi_amp = np.abs(csi_np)
 print(csi_amp.shape)
+csi_phase = np.unwrap(np.angle(csi_np),axis = 1)
+sub = scidx(20,2)
+print(sub.shape)
+csi_phase = calib(csi_phase,scidx(20,2))
+print(csi_phase.shape)
+
+
+# # 创建一个新的图形，包含两个子图
+# fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+
+# # 左边子图绘制幅值
+# axs[0].plot(range(len(csi_amplitude)), csi_amplitude[:, 0, 0, 0], label='CSI Amplitude', color='b')
+# axs[0].set_title('CSI Amplitude')
+# axs[0].set_xlabel('Index')
+# axs[0].set_ylabel('Amplitude')
+# axs[0].legend()
+
+# # 右边子图绘制相位
+# axs[1].plot(range(len(csi_phase2)), csi_phase2[:, 0, 0, 0], label='CSI Phase', color='r')
+# axs[1].set_title('CSI Phase')
+# axs[1].set_xlabel('Index')
+# axs[1].set_ylabel('Phase (radians)')
+# axs[1].legend()
+
+# plt.tight_layout()
+# plt.show()
+
+'''
 #数据去中心化
 centerize_csi_amp = centerize_csi(csi_amp)
 
@@ -45,7 +90,7 @@ interpolated_csi_amp,new_timestamps,timestamps_too_high,timestamps_too_low = int
 filtered_csi_amp = hampel_filter(interpolated_csi_amp,3,3)
 
 '''
-巴特沃斯滤波器，小波去噪，savitzky_golay滤波器降噪部分
+#巴特沃斯滤波器，小波去噪，savitzky_golay滤波器降噪部分
 '''
 # #设置巴特沃斯滤波器相关参数
 # #截止频率：一种常用的经验法则是选择截止频率的值，使其位于采样频率的一半以下，通常在0.2倍采样频率到0.4倍采样频率之间。
@@ -65,8 +110,8 @@ filtered_csi_amp = hampel_filter(interpolated_csi_amp,3,3)
 
 
 '''
-基于滑动方差的动作提取
-目前动作识别效果还是一般般，等待优化
+#基于滑动方差的动作提取
+#目前动作识别效果还是一般般，等待优化
 '''
 # # 使用函数
 # target_subcarrier_idx = 6
@@ -81,20 +126,20 @@ filtered_csi_amp = hampel_filter(interpolated_csi_amp,3,3)
 
 
 
-'''基于DTW算法的子载波选择
+'''#基于DTW算法的子载波选择
 #获得DTW矩阵
 #dtw_mat = compute_dtw_matrix(savitzky_golay_denoised_csi_amp)
 #dtw_select = select_subcarriers(dtw_mat)
 #print(dtw_select)
 '''
 
-'''基于PCA算法的数据降维
+'''#基于PCA算法的数据降维
 #采用pca数据降维，在数据降维之前首先要把数据压缩为2维数组
-reshaped_data = butterworth_denoised_csi_amp.reshape(savitzky_golay_denoised_csi_amp.shape[0], -1)
-pca_reduced_csi_amp,selected_eigenvectors, explained_variance_ratio = perform_pca(reshaped_data,0.95)
+#reshaped_data = butterworth_denoised_csi_amp.reshape(savitzky_golay_denoised_csi_amp.shape[0], -1)
+#pca_reduced_csi_amp,selected_eigenvectors, explained_variance_ratio = perform_pca(reshaped_data,0.95)
 #print(pca_reduced_csi_amp.shape)
 # 绘制图形，并将天线和子载波信息添加到图上
-plot_data(range(len(pca_reduced_csi_amp)),pca_reduced_csi_amp,selected_eigenvectors,7)
+#plot_data(range(len(pca_reduced_csi_amp)),pca_reduced_csi_amp,selected_eigenvectors,7)
 '''
 
 
@@ -107,11 +152,11 @@ plot_data(range(len(pca_reduced_csi_amp)),pca_reduced_csi_amp,selected_eigenvect
 
 
 
-# # 创建一个新的图形
-#plt.figure(figsize=(10, 5))
+# 创建一个新的图形
+plt.figure(figsize=(10, 5))
 
-# 绘制原始 CSI 幅度数据
-#plt.plot(range(len(csi_amp)), csi_amp[:, 0, 0, 5], label='init__csi', color='b')
+#绘制原始 CSI 幅度数据
+plt.plot(range(len(csi_amp)), csi_amp[:, 0, 0, 5], label='init__csi', color='b')
 # #绘制去中心化之后的csi数据
 # #plt.plot(range(len(centerize_csi_amp)), centerize_csi_amp[:, 0, 0, 6], label='centerize__csi', color='g')
 # #绘制数据插值之后的csi数据
@@ -128,7 +173,7 @@ plot_data(range(len(pca_reduced_csi_amp)),pca_reduced_csi_amp,selected_eigenvect
 # plt.legend()
 #plt.show()
 
-
+'''
 
 
 
