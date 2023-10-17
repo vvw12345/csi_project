@@ -36,11 +36,11 @@ def processing_function(file):
     timestamps = [entry['timestamp_low'] for entry in bf]
     csi_np = (np.array(csi_list))
     
-    #计算幅值和相位
+    #计算幅值和相位，并完成相位的校准
     csi_amp = np.abs(csi_np)
-    print(csi_amp.shape)
+    #print(csi_amp.shape)
     csi_phase = np.unwrap(np.angle(csi_np),axis = 1)
-    
+    csi_phase = calib(csi_phase,scidx(20,2))
     
     #数据去中心化
     centerize_csi_amp = centerize_csi(csi_amp)
