@@ -32,14 +32,17 @@ def train_naive_bayes_classifier(filepath):
     gnb.fit(X_train, y_train)
 
     # 使用分类器对测试集进行预测
-    y_pred = gnb.predict(X_test)
+    y_train_pred = gnb.predict(X_train)
+    y_test_pred = gnb.predict(X_test)
 
     # 计算分类器的准确率
-    accuracy = accuracy_score(y_test, y_pred)
+    train_accuracy = accuracy_score(y_train,y_train_pred)
+    test_accuracy = accuracy_score(y_test, y_test_pred)
 
-    return accuracy
+    return train_accuracy,test_accuracy
 
 # 调用函数
 readpath = './feature_output/output.csv'
-accuracy = train_naive_bayes_classifier(readpath)
-print("Accuracy:", accuracy)
+train_accuracy,test_accuracy = train_naive_bayes_classifier(readpath)
+print("Train Accuracy:", train_accuracy)
+print("Test Accuracy:",test_accuracy)

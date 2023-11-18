@@ -123,7 +123,19 @@ def select_subcarriers(dtw_matrix, num_to_select=10):
     return selection_indices[:num_to_select]
 
 
+# 绘制原始子载波和选出的子载波的对比图
+def plot_subcarriers_comparison(csi_data, selected_subcarriers):
+    num_subcarriers = csi_data.shape[3]
+    all_subcarriers = np.arange(num_subcarriers)
 
+    plt.figure(figsize=(10, 6))
+    plt.bar(all_subcarriers, np.mean(csi_data.reshape(-1, num_subcarriers), axis=0), label='All Subcarriers')
+    plt.bar(selected_subcarriers, np.mean(csi_data.reshape(-1, num_subcarriers)[:, selected_subcarriers], axis=0), label='Selected Subcarriers', color='red')
+    plt.xlabel('Subcarrier Index')
+    plt.ylabel('Average Amplitude')
+    plt.title('Comparison of All Subcarriers vs Selected Subcarriers')
+    plt.legend()
+    plt.show()
 
 
 

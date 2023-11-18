@@ -49,6 +49,8 @@ def processing_function(file):
     (interpolated_csi_amp,
       new_timestamps,timestamps_too_high,
      timestamps_too_low) = interpolate_and_remove_csi(centerize_csi_amp,timestamps,1100,900)
+    #print(timestamps_too_high)
+    #print(timestamps_too_low)
     
     # #hampel滤波器去除离群值
     filtered_csi_amp = hampel_filter(interpolated_csi_amp,3,3)
